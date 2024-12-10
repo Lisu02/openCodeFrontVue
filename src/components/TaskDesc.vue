@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import api from "@/services/axios";
-const resultFromBackend = ref({});
+const resultFromBackend = ref({ description: "no desc" });
 
 async function getDescription() {
   try {
@@ -9,7 +9,7 @@ async function getDescription() {
     resultFromBackend.value = response.data;
   } catch (error) {
     console.error("Error fetching task description", error);
-    resultFromBackend = {
+    resultFromBackend.value = {
       description: "Error fetching task description",
     };
   }

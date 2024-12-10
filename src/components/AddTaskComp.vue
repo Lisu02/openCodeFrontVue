@@ -35,8 +35,8 @@
       </div>
 
       <!-- Karty dla argumentów -->
-      <div>
-        <h3>Argumenty</h3>
+      <div class="argument-card">
+        <h2>Argumenty</h2>
         <div
           v-for="(arg, index) in task.argumentList"
           :key="arg.id"
@@ -68,7 +68,7 @@
             <button
               type="button"
               @click="removeArgument(index)"
-              class="btn btn-danger mt-2"
+              class="btn btn-danger mt-2 button-remove"
             >
               Usuń argument
             </button>
@@ -80,8 +80,8 @@
       </div>
 
       <!-- Karty dla testów -->
-      <div>
-        <h3>Testy</h3>
+      <div class="test-card">
+        <h2>Testy</h2>
         <div
           v-for="(test, index) in task.testList"
           :key="test.id"
@@ -117,7 +117,7 @@
             <button
               type="button"
               @click="removeTest(index)"
-              class="btn btn-danger mt-2"
+              class="btn btn-danger mt-2 button-remove"
             >
               Usuń test
             </button>
@@ -128,6 +128,13 @@
         </button>
       </div>
 
+      <div v-if="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+      <div v-if="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
       <!-- Przycisk do wysłania formularza -->
       <button type="submit" class="btn btn-success mt-3">Zapisz zadanie</button>
     </form>
@@ -136,7 +143,10 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import api from "@/services/axios"; // Zakładając, że masz plik axios.js do konfiguracji axios
+
+const router = useRouter();
 
 // Typy zwracane i argumentów
 const returnTypes = [
@@ -149,6 +159,9 @@ const returnTypes = [
   "INTVECTOR",
   "CHARVECTOR",
 ];
+
+const successMessage = ref("");
+const errorMessage = ref("");
 
 // Inicjalizacja danych zadania
 const task = ref({
@@ -216,7 +229,6 @@ const generateTestArguments = () => {
 
 // Funkcja wysyłająca dane formularza na backend
 const submitTask = async () => {
-  // Przygotowanie danych do wysłania
   const taskData = {
     functionName: task.value.functionName,
     returnType: task.value.returnType,
@@ -225,11 +237,18 @@ const submitTask = async () => {
   };
 
   try {
-    // Wysłanie danych przy pomocy axios
     const response = await api.post("/v1/addTask", taskData);
-    console.log("Zadanie zapisane", response.data);
+    successMessage.value = "Zadanie zostało pomyślnie zapisane!";
+    setTimeout(() => {
+      successMessage.value = "";
+      router.push("/chooseTask");
+    }, 2000); // Opóźnienie przed przekierowaniem
   } catch (e) {
+    errorMessage.value = "Błąd podczas zapisywania zadania. Spróbuj ponownie.";
     console.error("Błąd podczas wysyłania zadania:", e);
+    setTimeout(() => {
+      errorMessage.value = ""; // Usunięcie komunikatu błędu po kilku sekundach
+    }, 5000);
   }
 };
 </script>
@@ -238,6 +257,10 @@ const submitTask = async () => {
 /* Ustawienia ogólne formularza */
 .task-form {
   margin: 20px;
+}
+
+h2 {
+  background-color: #472caa;
 }
 
 label {
@@ -273,11 +296,25 @@ button:hover {
   background-color: #45a049;
 }
 
+.button-remove {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #bd5252;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px; /* Zaokrąglenie przycisków */
+}
+
+.button-remove:hover {
+  background-color: #913e3e;
+}
+
 /* Karty */
 .card {
   margin: 15px;
   border-radius: 10px;
-  border: 1px solid #000000;
+  border: 5px solid #000000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -292,6 +329,15 @@ button:hover {
 
 .card-body {
   margin: 10px 10px;
+  margin-bottom: 10px;
+}
+
+.argument-card {
+  margin-bottom: 100px;
+}
+
+.test-card {
+  margin-bottom: 100px;
 }
 
 .card-header h4 {
@@ -304,5 +350,24 @@ button:hover {
 
 .mb-3 {
   margin-bottom: 20px;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
 }
 </style>

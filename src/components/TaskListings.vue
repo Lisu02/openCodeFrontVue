@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import api from "@/services/axios";
 
 const props = defineProps({
@@ -9,6 +9,7 @@ const props = defineProps({
   },
 });
 
+const user = ref({});
 const tasks = ref([]);
 const filteredTasks = computed(() =>
   tasks.value.filter(
@@ -20,7 +21,28 @@ const filteredTasks = computed(() =>
   )
 );
 
+const fetchUser = async () => {
+  try {
+    const response = await api.get(`/userInfo/my`);
+    user.value = response.data;
+    console.log(user.value);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};
+
+const deleteTask = async (taskId) => {
+  try {
+    await api.delete(`/v1/task/${taskId}`);
+    tasks.value = tasks.value.filter((task) => task.taskId !== taskId);
+    alert("Task deleted successfully");
+  } catch (error) {
+    console.error("Error deleting task:", error);
+  }
+};
+
 onMounted(async () => {
+  await fetchUser();
   try {
     const response = await api.get(`/v1/taskId`);
     tasks.value = response.data;
@@ -42,11 +64,34 @@ onMounted(async () => {
       <RouterLink :to="`/solve/${task.taskId}`" class="solve-button">
         Solve this task
       </RouterLink>
+      <button
+        v-if="task.creatorUsername === user.username"
+        @click="deleteTask(task.taskId)"
+        class="delete-button"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
+.delete-button {
+  background-color: rgb(255, 0, 0);
+  width: 50%;
+  font-family: sans-serif;
+  color: rgb(255, 255, 255);
+  margin-top: 10px;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+.delete-button:hover {
+  background-color: #a31010;
+  cursor: pointer;
+}
+
 h1 {
   color: #333;
   margin-bottom: 20px;
