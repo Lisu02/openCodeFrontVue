@@ -37,6 +37,7 @@ const handleSubmit = async () => {
 
   try {
     const response = await api.post(`/login`, loginData);
+    console.log(response);
     if (response.status === 200) {
       token.value = await response.data;
       localStorage.setItem("jwtToken", token.value);
