@@ -8,6 +8,7 @@ import vueDevTools from "vite-plugin-vue-devtools";
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
   server: {
+    host: process.env.host || "0.0.0.0",
     port: process.env.port || 10000,
     proxy: {
       "/api": {
