@@ -47,7 +47,12 @@
           </div>
           <div class="card-body">
             <label for="type">Typ:</label>
-            <select v-model="arg.type" required class="form-control">
+            <select
+              v-model="arg.type"
+              @change="updateTestArguments"
+              required
+              class="form-control"
+            >
               <option value="INT">INT</option>
               <option value="FLOAT">FLOAT</option>
               <option value="DOUBLE">DOUBLE</option>
@@ -65,6 +70,7 @@
               required
               class="form-control"
             />
+
             <button
               type="button"
               @click="removeArgument(index)"
@@ -74,6 +80,7 @@
             </button>
           </div>
         </div>
+
         <button type="button" @click="addArgument" class="btn btn-primary">
           Dodaj argument
         </button>
@@ -91,7 +98,6 @@
             <h4>Test {{ index + 1 }}</h4>
           </div>
           <div class="card-body">
-            <!-- Dynamiczne argumenty w teście zależne od ilości argumentów -->
             <div
               v-for="(testArg, argIndex) in test.testInputArgumentDTOList"
               :key="testArg.id"
@@ -102,6 +108,7 @@
               <input
                 type="text"
                 v-model="testArg.testArgument"
+                @input="updateArgumentSize(testArg)"
                 required
                 class="form-control"
               />
@@ -145,6 +152,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import api from "@/services/axios"; // Zakładając, że masz plik axios.js do konfiguracji axios
+import { watch } from "vue";
 
 const router = useRouter();
 
@@ -202,8 +210,32 @@ const addTest = () => {
     id: task.value.testList.length + 1,
     testInputArgumentDTOList: generateTestArguments(),
     expectedValue: "",
+    size: calculateSize(task.value.returnType, ""), // Dodanie pola size na podstawie typu returnType
   });
 };
+
+// Funkcja aktualizująca listę testów po zmianach
+const updateTestSizes = () => {
+  task.value.testList.forEach((test) => {
+    test.size = calculateSize(task.value.returnType, test.expectedValue);
+  });
+};
+
+// Funkcja obliczająca rozmiar na podstawie wartości i typu
+const calculateSize = (type, value) => {
+  if (type === "INTVECTOR" || type === "CHARVECTOR") {
+    return value.split(",").filter((item) => item.trim() !== "").length;
+  }
+  return 0; // Rozmiar nie dotyczy innych typów
+};
+
+// Obserwator dla zmiany expectedValue
+watch(
+  () => task.value.testList.map((test) => test.expectedValue),
+  () => {
+    updateTestSizes(); // Automatyczna aktualizacja rozmiaru przy zmianie expectedValue
+  }
+);
 
 // Funkcja usuwająca test
 const removeTest = (index) => {
@@ -214,6 +246,7 @@ const removeTest = (index) => {
 const updateTestArguments = () => {
   task.value.testList.forEach((test) => {
     test.testInputArgumentDTOList = generateTestArguments();
+    test.testInputArgumentDTOList.forEach(updateArgumentSize);
   });
 };
 
@@ -227,6 +260,31 @@ const generateTestArguments = () => {
   }));
 };
 
+const updateArgumentSize = (testArg) => {
+  if (testArg.type === "INTVECTOR" || testArg.type === "CHARVECTOR") {
+    const trimmedInput = testArg.testArgument.trim();
+    testArg.size = trimmedInput
+      ? trimmedInput.split(",").filter((item) => item !== "").length
+      : 0;
+  }
+};
+
+// Przygotowanie danych do wysłania na backend
+const prepareDataForBackend = () => {
+  const dataToSend = {
+    ...task.value,
+    testList: task.value.testList.map((test) => ({
+      ...test,
+      testInputArgumentDTOList: test.testInputArgumentDTOList.map((testArg) => {
+        const updatedArg = { ...testArg };
+        updateArgumentSize(updatedArg); // Obliczanie size przed wysłaniem
+        return updatedArg;
+      }),
+    })),
+  };
+  return dataToSend;
+};
+
 // Funkcja wysyłająca dane formularza na backend
 const submitTask = async () => {
   const taskData = {
@@ -235,9 +293,10 @@ const submitTask = async () => {
     argumentList: task.value.argumentList,
     testList: task.value.testList,
   };
+  const dataToSend = prepareDataForBackend();
 
   try {
-    const response = await api.post("/v1/addTask", taskData);
+    const response = await api.post("/v1/addTask", dataToSend);
     successMessage.value = "Zadanie zostało pomyślnie zapisane!";
     setTimeout(() => {
       successMessage.value = "";

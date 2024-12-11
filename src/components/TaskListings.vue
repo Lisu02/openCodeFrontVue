@@ -78,7 +78,8 @@ onMounted(async () => {
 <style scoped>
 .delete-button {
   background-color: rgb(255, 0, 0);
-  width: 50%;
+  display: inline;
+  /* width: 60%; */
   font-family: sans-serif;
   color: rgb(255, 255, 255);
   margin-top: 10px;
@@ -124,10 +125,13 @@ p {
 }
 
 .solve-button {
+  /* display: inline-block; */
+  text-align: center;
+  width: 50%;
   margin-top: 10px;
   padding: 10px 20px;
   background-color: #00bd7e;
-  color: white;
+  color: rgb(255, 255, 255);
   text-decoration: none;
   border-radius: 4px;
   transition: background-color 0.3s ease;
