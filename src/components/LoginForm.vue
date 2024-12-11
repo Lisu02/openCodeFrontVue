@@ -36,6 +36,7 @@ const handleSubmit = async () => {
   };
 
   try {
+    console.log(loginData);
     const response = await api.post(`/login`, loginData);
     console.log(response);
     if (response.status === 200) {
@@ -46,6 +47,7 @@ const handleSubmit = async () => {
       router.push(`/playground`);
     }
   } catch (e) {
+    console.log(response);
     console.error("Login failed", e);
     errorMessage.value = "Nieprawidłowy login lub hasło"; // Ustaw komunikat o błędzie
   }
