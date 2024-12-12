@@ -13,9 +13,10 @@ export default defineConfig({
     port: process.env.port || 10000,
     proxy: {
       "/api": {
-        target: "http://16.171.165.136:443",
+        target: "https://16.171.165.136:443",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
       },
     },
   },
