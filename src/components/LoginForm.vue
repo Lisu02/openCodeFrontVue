@@ -40,14 +40,14 @@ const handleSubmit = async () => {
     const response = await api.post(`/login`, loginData);
     console.log(response);
     if (response.status === 200) {
-      token.value = await response.data;
+      token.value = await response.data.token;
       localStorage.setItem("jwtToken", token.value);
       isLoggedIn.value = true;
       errorMessage.value = ""; // Wyczyść błąd w przypadku sukcesu
       router.push(`/playground`);
     }
   } catch (e) {
-    console.log(response);
+    //console.log(response);
     console.error("Login failed", e);
     errorMessage.value = "Nieprawidłowy login lub hasło"; // Ustaw komunikat o błędzie
   }
