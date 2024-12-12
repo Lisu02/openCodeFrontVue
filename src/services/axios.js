@@ -12,9 +12,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+    config.headers["Content-Type"] = `application/json`;
+    config.headers["Accept"] = "application/json";
     return config;
   },
+  (response) => response,
   (error) => {
+    console.log("API error:", error);
     return Promise.reject(error);
   }
 );
