@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Tworzenie instancji axios
 const api = axios.create({
-  baseURL: `https://16.171.165.136/api`, // bazowy URL dla wszystkich zapytań
+  baseURL: `https://16.171.165.136`, // bazowy URL dla wszystkich zapytań
 });
 //https://16.171.165.136/api
 // Dodaj token do każdego zapytania
