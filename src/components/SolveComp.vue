@@ -13,7 +13,7 @@ defineProps({
 
 <template>
   <div>
-    <TaskDesc />
+    <TaskDesc v-bind:task-id="taskId"/>
     <EditorComp v-bind:is-playground="false" v-bind:task-id="taskId" />
   </div>
 </template>
