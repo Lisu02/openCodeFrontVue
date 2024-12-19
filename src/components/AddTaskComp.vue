@@ -137,12 +137,12 @@
 
       <div class="task-description-container">
         <div class="task-description">
-      <textarea
-          v-model="taskDescription"
-          placeholder="Wpisz opis zadania programistycznego..."
-          rows="6"
-          cols="50"
-      ></textarea>
+          <textarea
+            v-model="taskDescription"
+            placeholder="Wpisz opis zadania programistycznego..."
+            rows="6"
+            cols="50"
+          ></textarea>
         </div>
       </div>
 
@@ -308,15 +308,21 @@ const submitTask = async () => {
   };
   const dataToSend = prepareDataForBackend();
 
-await function sendDescription(description){
-    try {
-      const response = await api.post(`/v1/task/description/${}`)
-    }
-  }
-
   try {
     const response = await api.post("/v1/addTask", dataToSend);
     successMessage.value = "Zadanie zostało pomyślnie zapisane!";
+    const taskId = response.data;
+
+    const descriptionData = {
+      taskId: taskId,
+      description: taskDescription.value,
+    };
+
+    const response2 = await api.post(
+      "/v1/task/addDescription",
+      descriptionData
+    );
+
     setTimeout(() => {
       successMessage.value = "";
       router.push("/chooseTask");
