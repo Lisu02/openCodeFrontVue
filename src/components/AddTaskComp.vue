@@ -135,6 +135,17 @@
         </button>
       </div>
 
+      <div class="task-description-container">
+        <div class="task-description">
+      <textarea
+          v-model="taskDescription"
+          placeholder="Wpisz opis zadania programistycznego..."
+          rows="6"
+          cols="50"
+      ></textarea>
+        </div>
+      </div>
+
       <div v-if="successMessage" class="alert alert-success">
         {{ successMessage }}
       </div>
@@ -170,6 +181,8 @@ const returnTypes = [
 
 const successMessage = ref("");
 const errorMessage = ref("");
+
+const taskDescription = ref("");
 
 // Inicjalizacja danych zadania
 const task = ref({
@@ -295,6 +308,12 @@ const submitTask = async () => {
   };
   const dataToSend = prepareDataForBackend();
 
+await function sendDescription(description){
+    try {
+      const response = await api.post(`/v1/task/description/${}`)
+    }
+  }
+
   try {
     const response = await api.post("/v1/addTask", dataToSend);
     successMessage.value = "Zadanie zostało pomyślnie zapisane!";
@@ -409,6 +428,31 @@ button:hover {
 
 .mb-3 {
   margin-bottom: 20px;
+}
+
+.task-description-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.task-description {
+  width: 80%;
+  max-width: 800px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  resize: none;
 }
 
 .alert {
