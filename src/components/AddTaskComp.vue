@@ -17,6 +17,7 @@
               class="form-control"
               pattern="[A-Za-z0-9]+"
               title="Tylko litery i cyfry bez spacji"
+
             />
           </div>
 
@@ -346,7 +347,7 @@ const submitTask = async () => {
 }
 
 h2 {
-  background-color: #472caa;
+  background-color: #155724;
 }
 
 label {
