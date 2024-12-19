@@ -15,6 +15,8 @@
               v-model="task.functionName"
               required
               class="form-control"
+              pattern="[A-Za-z0-9]+"
+              title="Tylko litery i cyfry bez spacji"
             />
           </div>
 

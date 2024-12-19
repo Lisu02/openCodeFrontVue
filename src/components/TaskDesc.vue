@@ -12,15 +12,16 @@ const props = defineProps({
   },
 });
 
-const {taskId} = toRefs(props);
+const { taskId } = toRefs(props);
 
 async function getDescription() {
   try {
     const response = await api.get(`/v1/task/description/${taskId.value}`);
-    if(response.status === 200){
+    if (response.status === 200) {
       resultFromBackend.value = response.data.description;
-    }else {
-      resultFromBackend.value = "Error while fetching task description (try) TaskDesc.vue";
+    } else {
+      resultFromBackend.value =
+        "Error while fetching task description (try) TaskDesc.vue";
     }
   } catch (error) {
     console.error("Error fetching task description", error);
@@ -40,8 +41,10 @@ getDescription();
 <style lang="css" scoped>
 textarea {
   color: #ccc;
-  width: 99%;
-  height: 90%;
+  padding-left: 2.5%;
+  padding-right: 2.5%;
+  width: 95%;
+  height: 10vw;
   background-color: #282d35;
   font-family: sans-serif;
   font-size: 18px;
